@@ -10,23 +10,27 @@ It stores the last result and position in the monitored file in a SQL database s
 rolls over the monitor is smart enough to see that and starts from the beginning of the file again. The table in the database can be created by running the attached script or you can use the
 screenshot from the Design view in the table to manually enter the values. The script will create the table on a database called dynaTracePluginDB. Change this name if you desire.
 
+![images_community/download/attachments/114557276/LogRecords_Schema_Screenshot.jpg](images_community/download/attachments/114557276/1.png)
+
+![images_community/download/attachments/114557276/LogRecords_Schema_Screenshot.jpg](images_community/download/attachments/114557276/2.png)
+
 ![images_community/download/attachments/114557276/LogRecords_Schema_Screenshot.jpg](images_community/download/attachments/114557276/LogRecords_Schema_Screenshot.jpg)
 
 ![images_community/download/attachments/114557276/LogFileMonitor_Schema_Screenshot.jpg](images_community/download/attachments/114557276/LogFileMonitor_Schema_Screenshot.jpg)
 
 ![images_community/download/attachments/114557276/log_file_scrapper2.jpg](images_community/download/attachments/114557276/log_file_scrapper2.jpg)
 
-LogRecord Table Schema
-
-LogFileMonitor Schema
-
 Monitor Properties
+
+LogRecord Table Schema
 
 ![images_community/download/attachments/114557276/log_file_scrapper.jpg](images_community/download/attachments/114557276/log_file_scrapper.jpg)
 
-![images_community/download/attachments/114557276/log_file_scrapper_measures.jpg](images_community/download/attachments/114557276/log_file_scrapper_measures.jpg)
-
 Monitor Properties
+
+LogFileMonitor Schema
+
+![images_community/download/attachments/114557276/log_file_scrapper_measures.jpg](images_community/download/attachments/114557276/log_file_scrapper_measures.jpg)
 
 Log File Monitor Measures
 
