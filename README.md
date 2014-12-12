@@ -68,8 +68,7 @@ Log File Monitor Measures
 |SQL Password|The password for the username used to connect to the SQL database
 |Additional Lines|Amount of additional lines to include in file after the log message is found
 |Skip Additional Records|If this box is checked, records included in the additional lines will be skipped for processing
-|Keep Historical Record|If this box is checked, a historical record of each log message will be added to the LogRecords database. This database can then be queried for a list of all log messages matching a specific search
-and the corresponding timestamps
+|Keep Historical Record|If this box is checked, a historical record of each log message will be added to the LogRecords database. This database can then be queried for a list of all log messages matching a specific search and the corresponding timestamps
 
 ## Installation
 
