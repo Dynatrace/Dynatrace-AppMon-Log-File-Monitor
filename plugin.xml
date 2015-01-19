@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<!-- plugin.xml file written by dynaTrace Client 4.2.0 -->
+<plugin>
+  <extension point="com.dynatrace.diagnostics.pdk.pluginconfig" id="com.logfile" name="Log File Scraper">
+    <information>
+      <category value="" />
+      <displayname value="Log File Scraper" />
+      <description value="Searches a log file for a regular expression and returns if a new line was found, and the last line number to contain the regex." />
+      <supportlevel value="unsupported" />
+    </information>
+    <configuration>
+      <property key="OS" label="OS" type="list" description="The operating system of the server containing the log file." default="Windows">
+        <list>
+          <item value="Linux" />
+          <item value="Windows" />
+        </list>
+      </property>
+      <property key="LUser" label="Linux Username" type="string" description="Linux Username to use." default="" multiline="false">
+        <visibility>
+          <rule key="OS" value="Linux" />
+        </visibility>
+      </property>
+      <property key="LPass" label="Linux Password" type="password" description="Linux password to use" default="">
+        <visibility>
+          <rule key="OS" value="Linux" />
+        </visibility>
+      </property>
+      <property key="Directory" label="Directory" type="string" description="The directory on the server that contains the log file." default="\d$\" multiline="false" />
+      <property key="FileRegex" label="File Regex" type="boolean" description="If this is selected then the file must be specified in terms of a regex expression.  If the directory contains multiple files that match the regex the newest file will be selected" default="false" />
+      <property key="File" label="File" type="string" description="The File that you wish to search.  If the File Regex option is checked, then this must be a regex." default="" multiline="false" />
+      <property key="SearchTerm" label="Search Term" type="string" description="A regex of what you wish to search for within the log file.  The search is completed per line." default="" multiline="false" />
+      <property key="dbType" label="Database Type" type="list" description="The type of database where the log file scraper entries will be stored." default="SQL Server">
+        <list>
+          <item value="SQL Server" />
+          <item value="PostGreSQL" />
+          <item value="Oracle" />
+        </list>
+      </property>
+      <property key="SQLServer" label="SQL Server" type="string" description="SQL Server to contain the repository of log file searches" default="dix-d-shddbs-01.sentry.com" multiline="false" />
+      <property key="SQLPort" label="SQL Port" type="string" description="Port to connect to on the SQL Server" default="" multiline="false" />
+      <property key="Database" label="Database" type="string" description="The database to use for the log file repository." default="dynaTracePluginDB" multiline="false" />
+      <property key="Username" label="SQL Username" type="string" description="Username used to connect to the SQL Database" default="App_DT_Plugin_D" multiline="false" />
+      <property key="Password" label="SQL Password" type="password" description="The password for the username used to connect to the SQL database" default="duBAbr2S" />
+      <property key="AddLines" label="Additional Lines" type="double" description="Amount of additional lines to include in file after the log message is found" default="0.0" />
+      <property key="SkipRec" label="Skip Additional Records" type="boolean" description="If this box is checked, records included in the additional lines will be skipped for processing." default="true" />
+      <property key="Record" label="Keep Historical Record" type="boolean" description="If this box is check a historical record of the each log message will be added to the LogMessageHistoricalRecord database.  This database can then be queried for a list of all log messages matching a specific search and the corresponding timestamps." default="false" />
+    </configuration>
+  </extension>
+  <extension point="com.dynatrace.diagnostics.pdk.monitor" id="com.logfile.monitor" name="Log File Scraper">
+    <plugin configid="com.logfile" class="com.logfile.WP" />
+  </extension>
+  <extension point="com.dynatrace.diagnostics.pdk.monitormetricgroup" id="com.logfile.logFileScraper" name="Log File Scraper">
+    <metricgroup monitorid="com.logfile.monitor">
+      <metric defaultrate="purepath" name="New Message" unit="number" description="Returns a 1 if a new entry was made to log file with the search term specified." />
+      <metric defaultrate="purepath" name="Line Number" unit="number" description="The Line Number of the last known occurance of the specified search term." />
+      <metric defaultrate="purepath" name="Number of Messages" unit="number" description="The number of lines that matched the Search Term.">
+        <property key="Error Code" value="*" optional="false" />
+      </metric>
+    </metricgroup>
+  </extension>
+</plugin>
+
