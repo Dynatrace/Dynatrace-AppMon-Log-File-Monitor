@@ -26,10 +26,10 @@
           <rule key="OS" value="Linux" />
         </visibility>
       </property>
-      <property key="Directory" label="Directory" type="string" description="The directory on the server that contains the log file." default="\d$\" multiline="false" />
+      <property key="Directory" label="Directory" type="string" description="The network path to the shared filed on the server that contains the log file.  &#xA;Example: /myapplication/logs/  &#xA;This entry will be combined with the host name to create the network path to the file: //localhost/myapplication/logs/" default="/myapplications/logs/" multiline="false" />
       <property key="FileRegex" label="File Regex" type="boolean" description="If this is selected then the file must be specified in terms of a regex expression.  If the directory contains multiple files that match the regex the newest file will be selected" default="false" />
-      <property key="File" label="File" type="string" description="The File that you wish to search.  If the File Regex option is checked, then this must be a regex." default="" multiline="false" />
-      <property key="SearchTerm" label="Search Term" type="string" description="A regex of what you wish to search for within the log file.  The search is completed per line." default="" multiline="false" />
+      <property key="File" label="File" type="string" description="The File that you wish to search.  If the File Regex option is checked, then this must be a regex. If running using Windows, this file must be shared to the user running the dynaTrace Collector." default="Example.log" multiline="false" />
+      <property key="SearchTerm" label="Search Term" type="string" description="A regex of what you wish to search for within the log file.  The search is completed per line. Example .*Warning.*" default="" multiline="false" />
       <property key="dbType" label="Database Type" type="list" description="The type of database where the log file scraper entries will be stored." default="SQL Server">
         <list>
           <item value="SQL Server" />
@@ -37,12 +37,12 @@
           <item value="Oracle" />
         </list>
       </property>
-      <property key="SQLServer" label="SQL Server" type="string" description="SQL Server to contain the repository of log file searches" default="dix-d-shddbs-01.sentry.com" multiline="false" />
-      <property key="SQLPort" label="SQL Port" type="string" description="Port to connect to on the SQL Server" default="" multiline="false" />
-      <property key="Database" label="Database" type="string" description="The database to use for the log file repository." default="dynaTracePluginDB" multiline="false" />
-      <property key="Username" label="SQL Username" type="string" description="Username used to connect to the SQL Database" default="App_DT_Plugin_D" multiline="false" />
-      <property key="Password" label="SQL Password" type="password" description="The password for the username used to connect to the SQL database" default="duBAbr2S" />
-      <property key="AddLines" label="Additional Lines" type="double" description="Amount of additional lines to include in file after the log message is found" default="0.0" />
+      <property key="SQLServer" label="Database Server" type="string" description="Database server to contain the repository of log file searches." default="localhost" multiline="false" />
+      <property key="SQLPort" label="Database Port" type="string" description="Port to connect to on the database server.  Default ports are:&#xA;Oracle: 1521, SQL Server: 1433, PostGreSQL: 5432" default="" multiline="false" />
+      <property key="Database" label="Database Name" type="string" description="The database to use for the log file repository." default="dynaTracePluginDB" multiline="false" />
+      <property key="Username" label="Database Username" type="string" description="Username used to connect to the SQL Database" default="User" multiline="false" />
+      <property key="Password" label="Database Password" type="password" description="The password for the username used to connect to the SQL database" default="duBAbr2S" />
+      <property key="AddLines" label="Additional Lines" type="double" description="Amount of additional lines to be captured from the file after the log message is found." default="0.0" />
       <property key="SkipRec" label="Skip Additional Records" type="boolean" description="If this box is checked, records included in the additional lines will be skipped for processing." default="true" />
       <property key="Record" label="Keep Historical Record" type="boolean" description="If this box is check a historical record of the each log message will be added to the LogMessageHistoricalRecord database.  This database can then be queried for a list of all log messages matching a specific search and the corresponding timestamps." default="false" />
     </configuration>

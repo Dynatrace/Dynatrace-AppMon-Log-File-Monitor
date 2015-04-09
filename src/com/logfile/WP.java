@@ -13,6 +13,7 @@ import com.dynatrace.diagnostics.pdk.Status;
 import java.util.List;
 import java.util.Random;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -115,8 +116,28 @@ public class WP implements Monitor {
 	    	 {
 	    		 thefile = new File("\\\\" + connectionIP + directory + file);
 	    	 }
-	    	 List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
-	    	 lines = lineList.toArray(new String[lineList.size()]);;
+	    	 try {
+	    		List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
+	    	 	lines = lineList.toArray(new String[lineList.size()]);;
+	    	 }
+	    	 catch (FileNotFoundException e) {
+				  StringWriter sw = new StringWriter();
+				  PrintWriter pw = new PrintWriter(sw);
+				  e.printStackTrace(pw);
+				  log.warning(sw.toString());
+				  Status error = new Status(Status.StatusCode.ErrorInfrastructureUnreachable);
+	    		  error.setMessage("No file found, please ensure that the file is shared and that access to the file is available from the user running the collector.");
+	    		  return error;
+	    	 }
+	    	 catch (Exception f) {
+	    		  StringWriter sw = new StringWriter();
+				  PrintWriter pw = new PrintWriter(sw);
+				  f.printStackTrace(pw);
+				  log.warning(sw.toString());
+				  Status error = new Status(Status.StatusCode.ErrorInternalConfigurationProblem);
+	    		  error.setMessage("Plugin configuration issue, please ensure the correct settings are entered into the monitor configuration.");
+	    		  return error;
+	    	 }
 	     }
 	     
 	     if(lines != null)
