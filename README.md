@@ -8,6 +8,6 @@ It stores the last result and position in the monitored file in a SQL database s
 rolls over the monitor is smart enough to see that and starts from the beginning of the file again. The table in the database can be created by running the attached script or you can use the
 screenshot from the Design view in the table to manually enter the values. The script will create the table on a database called dynaTracePluginDB. Change this name if you desire.
 
-Find further information in the [dynaTrace community](https://community.compuwareapm.com/community/display/DL/Log+File+Monitor)
+Find further information in the [dynaTrace community](https://community.dynatrace.com/community/display/DL/Log+File+Monitor)
 
 
