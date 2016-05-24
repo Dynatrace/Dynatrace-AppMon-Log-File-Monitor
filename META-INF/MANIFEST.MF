@@ -4,7 +4,7 @@ Bundle-Vendor: dynaTrace Community
 Bundle-ClassPath: .,lib/com.dynatrace.diagnostics.sdk.jar,lib/guava-14
  .0.1.jar,lib/jsch-0.1.49.jar,lib/ojdbc6.jar,lib/postgresql-9.3-1102.j
  dbc4.jar,lib/sqljdbc4.jar
-Bundle-Version: 3.15.5
+Bundle-Version: 3.15.8
 Bundle-Name: Log File Scraper
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.logfile;singleton:=true
