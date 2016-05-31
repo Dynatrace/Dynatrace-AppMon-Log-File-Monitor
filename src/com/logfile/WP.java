@@ -78,7 +78,7 @@ public class WP implements Monitor {
 		     }
 		     if(FRegex)
 		     {
-		    	 String findcommand = "ls " + realfile + " -ltc | awk \'{print $9}\'";
+		    	 String findcommand = "ls -ltc " + realfile + " | awk \'{print $9}\'";
 		    	 String filereturn = instance.sendCommand(findcommand);
 		    	 if(filereturn.equals(""))
 	    		 {
