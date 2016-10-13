@@ -34,6 +34,7 @@ public class LogFile{
 		int UUID = 0;
 		//long UUID = 0;
 		public int nummessages = 0;
+		boolean newFile = false;
 		
 		// Define the connection to the database
 		String DatabaseType = null;
@@ -73,8 +74,8 @@ public class LogFile{
 			SQLDriver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 		}
 		else if (DatabaseType.equals("PostGreSQL")) {
-				connectionUrl = "jdbc:postgresql://" + SQLServer + ":" + Port + "/" + Database + "?user=" + Username + "&password=" + Password;
-				SQLDriver = "org.postgresql.Driver";
+			connectionUrl = "jdbc:postgresql://" + SQLServer + ":" + Port + "/" + Database + "?user=" + Username + "&password=" + Password;
+			SQLDriver = "org.postgresql.Driver";
 		}
 		else if (DatabaseType.equals("Oracle")) {
 			connectionUrl = "jdbc:oracle:thin:" + Username + "/" + Password + "@" + SQLServer + ":" + Port + ":" + Database;
@@ -119,8 +120,8 @@ public class LogFile{
 		    	 startline = rs.getInt("Last_Line_Number");
 		    	 //UUID = rs.getLong("LogID");
 		    	 UUID = rs.getInt("LogID");
-		    	 String test = "Last Line Count:" + lasttotal + ", Last Line Number:" + startline;
-		    	 // log.info(test);
+		    	 //String test = "Last Line Count:" + lasttotal + ", Last Line Number:" + startline;
+		    	 //log.info("Log ID " + UUID + ": " + test);
 		     }
 		     
 		     // If there is not a previous search, create a new record within the DB
@@ -148,7 +149,8 @@ public class LogFile{
 			    	 UUID = rs.getInt("LogID");
 			    	 //UUID = rs.getLong("LogID");
 			     }
-			     log.info("Log ID " + UUID + ": No Record for current search in database.  A new record was created");
+			     newFile = true;
+			     log.info("Log ID " + UUID + ": No Record for current search in database.  A new record was created for " + lookfor + " on " + sqlfilename);
 		     }
 		  }
 		// Handle any errors that may have occurred.
@@ -171,10 +173,13 @@ public class LogFile{
 		current = read.length-1;
 		linenumber = 0;
 		newmessage = 0;
-		if(current < lasttotal)
+		//log.info("Log ID " + UUID + ": Last Total = " + lasttotal + ", Current = " + current);
+		//Compares current file length to Line_Count entry in database to determine if it is a new file
+		//if(current <= lasttotal && newFile)
+		if(newFile)
 		{
 			lasttotal = -1;
-			log.info("Log ID " + UUID + ": New File Found! " + current);
+			log.info("Log ID " + UUID + ": New File Found!");
 		}
 		for(int x=lasttotal+1; x<read.length; x++)
 		{
@@ -240,7 +245,7 @@ public class LogFile{
 	    		//rows = stmt.executeUpdate( "update LogFileMonitor set Line_Count = " +  current + ",Last_Line_Number = " + linenumber + " where LogID = "+ UUID + ";");
 	    	}
 	    	log.info("Log ID " + UUID + ": Updated summary data within the LogFileMonitor table");
-	    	// log.info(monitorUpdate);
+	    	//log.info("Log ID " + UUID + ": " + monitorUpdate);
 	    	rows = stmt.executeUpdate(monitorUpdate);
 	    	//rows = stmt.executeUpdate( "update LogFileMonitor set Last_Line_Number = " + linenumber + " where server = '" + server + "' and directory = '" + sqlfilename + "' and search_term = '" + lookfor +  "';");
 	    	
@@ -267,7 +272,7 @@ public class LogFile{
 	    		}
 	    		// log.info(monitorUpdate);	
 	    		rows = stmt.executeUpdate(monitorUpdate);
-	    		log.info("Log ID " + UUID + ": Final Line Found = " + finalline);
+	    		log.info("Log ID " + UUID + ": Final Line Found = '" + finalline + "'" );
 	    		
 	    		// Record individual messages if "Keep Historical Record" is checked
 	    		if(doHistory)

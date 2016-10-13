@@ -6,7 +6,7 @@
   */
   package com.logfile;
 
-  import com.jcraft.jsch.*;
+import com.jcraft.jsch.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -23,6 +23,7 @@ import java.util.logging.Logger;
   private String strPassword;
   private Session sesConnection;
   private int intTimeOut;
+  private String keyFile;
 
   @SuppressWarnings("static-access")
 private void doCommonConstructorActions(String userName, 
@@ -77,15 +78,14 @@ private void doCommonConstructorActions(String userName,
   public String connect()
   {
      String errorMessage = null;
-
      try
      {
-        sesConnection = jschSSHChannel.getSession(strUserName, 
-            strConnectionIP, intConnectionPort);
-        sesConnection.setPassword(strPassword);
-        // UNCOMMENT THIS FOR TESTING PURPOSES, BUT DO NOT USE IN PRODUCTION
-        // sesConnection.setConfig("StrictHostKeyChecking", "no");
-        sesConnection.connect(intTimeOut);
+	        sesConnection = jschSSHChannel.getSession(strUserName, 
+	            strConnectionIP, intConnectionPort);
+	        sesConnection.setPassword(strPassword);
+	        // UNCOMMENT THIS FOR TESTING PURPOSES, BUT DO NOT USE IN PRODUCTION
+	        // sesConnection.setConfig("StrictHostKeyChecking", "no");
+	        sesConnection.connect(intTimeOut);
      }
      catch(JSchException jschX)
      {

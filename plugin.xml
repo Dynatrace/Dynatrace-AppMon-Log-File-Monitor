@@ -16,14 +16,34 @@
           <item value="Windows" />
         </list>
       </property>
+      <property key="method" label="Connection Type" type="list" description="The connection is either local or through SSH" default="SSH">
+        <list>
+          <item value="SSH" />
+          <item value="Local" />
+        </list>
+      </property>
+      <property key="authMethod" label="SSH Type" type="list" description="Describes whether a Password or a Public Key is used." default="Password">
+        <list>
+          <item value="Password" />
+          <item value="Public Key" />
+        </list>
+        <visibility>
+          <rule key="method" value="SSH" />
+        </visibility>
+      </property>
       <property key="LUser" label="Linux Username" type="string" description="Linux Username to use." default="" multiline="false">
         <visibility>
-          <rule key="OS" value="Linux" />
+          <rule key="method" value="SSH" />
         </visibility>
       </property>
       <property key="LPass" label="Linux Password" type="password" description="Linux password to use" default="">
         <visibility>
-          <rule key="OS" value="Linux" />
+          <rule key="method" value="SSH" />
+        </visibility>
+      </property>
+      <property key="Key" label="SSH Key" type="string" description="The private keyfile on the Collector for the ssh-keypair, e.g. C:/.ssh/id_rsa" default="default" multiline="false">
+        <visibility>
+          <rule key="authMethod" value="Public Key" />
         </visibility>
       </property>
       <property key="Directory" label="Directory" type="string" description="The network path to the shared filed on the server that contains the log file.  &#xA;Example: /myapplication/logs/  &#xA;This entry will be combined with the host name to create the network path to the file: //localhost/myapplication/logs/" default="/myapplications/logs/" multiline="false" />
@@ -44,7 +64,7 @@
       <property key="Password" label="Database Password" type="password" description="The password for the username used to connect to the SQL database" default="duBAbr2S" />
       <property key="AddLines" label="Additional Lines" type="double" description="Amount of additional lines to be captured from the file after the log message is found." default="0.0" />
       <property key="SkipRec" label="Skip Additional Records" type="boolean" description="If this box is checked, records included in the additional lines will be skipped for processing." default="true" />
-      <property key="Record" label="Keep Historical Record" type="boolean" description="If this box is check a historical record of the each log message will be added to the LogMessageHistoricalRecord database.  This database can then be queried for a list of all log messages matching a specific search and the corresponding timestamps." default="false" />
+      <property key="Record" label="Keep Historical Record" type="boolean" description="If this box is check a historical record of the each log message will be added to the LogRecords table within the database.  This table can then be queried for a list of all log messages matching a specific search and the corresponding timestamps." default="false" />
     </configuration>
   </extension>
   <extension point="com.dynatrace.diagnostics.pdk.monitor" id="com.logfile.monitor" name="Log File Scraper">
@@ -60,4 +80,3 @@
     </metricgroup>
   </extension>
 </plugin>
-
