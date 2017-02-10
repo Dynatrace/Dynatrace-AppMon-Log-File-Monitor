@@ -157,7 +157,7 @@ public class WP implements Monitor {
 	@Override
 	public Status execute(MonitorEnvironment env) throws Exception {
 	     Status resultstat = new Status(Status.StatusCode.Success);
-	     String fileHost = env.getHost().getAddress();
+		 String connectionIP = env.getHost().getAddress();
 	     String OS = env.getConfigString("OS");
 	     String sshConnMethod = env.getConfigString("authMethod");
 	     String directory = env.getConfigString("Directory");
@@ -180,7 +180,8 @@ public class WP implements Monitor {
 	     int line = 0;
 	     String result = null;
 	     String[] lines = null;
-	     log.info("Connecting to " + realfile + " on " + fileHost +"...");
+	     String fullpath=null;
+	     log.info("Connecting to " + realfile + " on " + connectionIP +"...");
 	     if(OS.equals("Linux"))
 	     {
 	    	 //String sshUserName = env.getConfigString("LUser");
@@ -225,7 +226,7 @@ public class WP implements Monitor {
 		     }*/
 		     if(FRegex)
 		     {
-		    	 String findcommand = "ls " + realfile + " -ltc | awk \'{print $9}\'";
+		    	 String findcommand = "ls -ltc " + realfile + " | awk \'{print $9}\'";
 		    	 //OLD CODE 
 		    	 //String filereturn = instance.sendCommand(findcommand);
 		    	 //NEW CODE
@@ -258,13 +259,15 @@ public class WP implements Monitor {
 		     //OLD CODE 
 		     //instance.close();
 		     lines = result.split("(\\n|\\r)");
+		     
+		     fullpath="//"+connectionIP+realfile;
 	     }
 	     else if(OS.equals("Windows"))
 	     {
 	    	 File thefile = null; 
 	    	 if(FRegex)
 	    	 {
-	    		 thefile = WinFileRegex.lastFileModified(("\\\\" + fileHost + directory), file);
+	    		 thefile = WinFileRegex.lastFileModified(("\\\\" + connectionIP + directory), file);
 	    		 if(thefile == null)
 	    		 {
 	    			 stat.setStatusCode(Status.StatusCode.ErrorInfrastructureUnreachable);
@@ -274,11 +277,12 @@ public class WP implements Monitor {
 	    	 }
 	    	 else
 	    	 {
-	    		 thefile = new File("\\\\" + fileHost + directory + file);
+	    		 thefile = new File("\\\\" + connectionIP + directory + file);
 	    	 }
 	    	 try {
 	    		List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
 	    	 	lines = lineList.toArray(new String[lineList.size()]);;
+	    	 	fullpath=thefile.getPath();
 	    	 }
 	    	 catch (FileNotFoundException e) {
 				  StringWriter sw = new StringWriter();
@@ -303,7 +307,7 @@ public class WP implements Monitor {
 	     if(lines != null)
 	     {
 	    	 
-	    	 LogFile linlog = new LogFile(fileHost,directory,file,search,dbType,SQLServer,Database,sqlPort,sqlUsername,sqlPassword);
+	    	 LogFile linlog = new LogFile(connectionIP,/*directory,file,*/fullpath,search,dbType,SQLServer,Database,sqlPort,sqlUsername,sqlPassword);
 	    	 linlog.getCurrentValues();
 	    	 line = linlog.checkFile(lines, (int) additionallines, skiprec);
 	    	 lines = null;
