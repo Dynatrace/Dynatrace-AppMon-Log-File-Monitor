@@ -20,11 +20,12 @@ public class LogFile{
 	
 	// Garbage used to define the search terms and the file to check
 		String server = null;
-		String director = null;
-		String thefile = null;
+		//String director = null;
+		//String thefile = null;
 		String lookfor = null;
-		String sqlfilename = null;
-		String filename = null;
+		//String sqlfilename = null;
+		//String filename = null;
+		String fullpath = null;
 		String finalline = null;
 		int lasttotal = 0;
 		int linenumber = 1;
@@ -34,7 +35,6 @@ public class LogFile{
 		int UUID = 0;
 		//long UUID = 0;
 		public int nummessages = 0;
-		boolean newFile = false;
 		
 		// Define the connection to the database
 		String DatabaseType = null;
@@ -51,16 +51,17 @@ public class LogFile{
 		boolean hasRows = false;
 		Collection<String> collection = new ArrayList<String>();
 	
-	public LogFile(String server2, String directory, String file, String SearchTerm, String DBType, String sql, String database, String SPort, String suser, String spass)
+	public LogFile(String pserver,/* String directory, String file,*/ String pfullpath, String SearchTerm, String DBType, String sql, String database, String SPort, String suser, String spass)
 	{
 		newmessage = 0;
 		hasRows = false;
-		server = server2;
-		director = "\\\\" + server + directory;
-		thefile = file;
+		fullpath=pfullpath;
+		server = pserver;
+		// director = "\\\\" + server + directory;
+		// thefile = file;
 		lookfor = SearchTerm;
-		sqlfilename = director + thefile;
-		filename = director + thefile;
+		//sqlfilename = director + thefile;
+		//filename = director + thefile;
 		DatabaseType = DBType;
 		SQLServer = sql;
 		Port = SPort;
@@ -98,7 +99,7 @@ public class LogFile{
 				SQL = "select ALL LogFileMonitor.* from LogFileMonitor where LogFileMonitor.Server='" + server + "' and LogFileMonitor.Search_Term='" + lookfor +  "'";
 				//SQL = "select LOGFILEMONITOR.LogID from System.LOGFILEMONITOR";
 			} else {
-				SQL = "select * from LogFileMonitor where Server='" + server + "' and Directory='" + sqlfilename + "' and Search_Term='" + lookfor +  "';";
+				SQL = "select * from LogFileMonitor where Server='" + server + "' and Directory='" + /*sqlfilename*/ fullpath + "' and Search_Term='" + lookfor +  "';";
 			}
 			try {
 		     stmt = con.createStatement();
@@ -127,9 +128,9 @@ public class LogFile{
 		     // If there is not a previous search, create a new record within the DB
 		     if(!hasRows) {
 		    	 if (DatabaseType.equals("Oracle")) {	 
-		    		 SQL = "Insert into LogFileMonitor (LogID,Server,Line_Count,Last_Line_Number,Directory,Search_Term,Log_Message) VALUES (logFile_seq.NEXTVAL,'" + server + "',0,0,'" + sqlfilename + "','" + lookfor + "',' ')";
+		    		 SQL = "Insert into LogFileMonitor (LogID,Server,Line_Count,Last_Line_Number,Directory,Search_Term,Log_Message) VALUES (logFile_seq.NEXTVAL,'" + server + "',0,0,'" + /*sqlfilename*/ fullpath + "','" + lookfor + "',' ')";
 		    	 } else {
-		    		 SQL = "Insert into LogFileMonitor (Server,Line_Count,Last_Line_Number,Directory,Search_Term,Log_Message) VALUES ('" + server + "',0,0,'" + sqlfilename + "','" + lookfor + "',' ');";
+		    		 SQL = "Insert into LogFileMonitor (Server,Line_Count,Last_Line_Number,Directory,Search_Term,Log_Message) VALUES ('" + server + "',0,0,'" + /*sqlfilename*/ fullpath + "','" + lookfor + "',' ');";
 		    	 }
 		    	 int up = stmt.executeUpdate(SQL);
 		    	 linenumber = 0;
@@ -140,7 +141,7 @@ public class LogFile{
 		    		 SQL = "select LogID from LogFileMonitor where LogFileMonitor.Server='" + server + "' and LogFileMonitor.Search_Term='" + lookfor +  "'";
 		    		 //SQL = "select * from LogFileMonitor where Server = \"" + server + "\" and Directory = \"" + sqlfilename + "\" and Search_Term = \"" + lookfor +  "\"";
 		    	 } else {
-		    		 SQL = "select * from LogFileMonitor where Server = '" + server + "' and Directory = '" + sqlfilename + "' and Search_Term = '" + lookfor +  "';";
+		    		 SQL = "select * from LogFileMonitor where Server = '" + server + "' and Directory = '" + /*sqlfilename*/ fullpath + "' and Search_Term = '" + lookfor +  "';";
 		    	 }
 		    	 stmt = con.createStatement();
 			     // log.info(SQL);
@@ -149,8 +150,7 @@ public class LogFile{
 			    	 UUID = rs.getInt("LogID");
 			    	 //UUID = rs.getLong("LogID");
 			     }
-			     newFile = true;
-			     log.info("Log ID " + UUID + ": No Record for current search in database.  A new record was created for " + lookfor + " on " + sqlfilename);
+			     log.info("Log ID " + UUID + ": No Record for current search in database.  A new record was created for " + lookfor + " on " + fullpath);
 		     }
 		  }
 		// Handle any errors that may have occurred.
@@ -173,13 +173,10 @@ public class LogFile{
 		current = read.length-1;
 		linenumber = 0;
 		newmessage = 0;
-		//log.info("Log ID " + UUID + ": Last Total = " + lasttotal + ", Current = " + current);
-		//Compares current file length to Line_Count entry in database to determine if it is a new file
-		//if(current <= lasttotal && newFile)
-		if(newFile)
+		if(current < lasttotal)
 		{
 			lasttotal = -1;
-			log.info("Log ID " + UUID + ": New File Found!");
+			log.info("Log ID " + UUID + ": New File Found! " + current);
 		}
 		for(int x=lasttotal+1; x<read.length; x++)
 		{
@@ -284,9 +281,9 @@ public class LogFile{
 	    				RecordCount = RecordCount + 1;
 	    				String HistorySQL = null;
 	    				if (DatabaseType.equals("Oracle")) {
-	    					HistorySQL = "Insert into LogRecords VALUES (" + UUID + ",'" + OS + "'," + epoch + ",'" + sqlfilename + "','" + lookfor + "','" + server + "','" + s + "')";
+	    					HistorySQL = "Insert into LogRecords VALUES (" + UUID + ",'" + OS + "'," + epoch + ",'" + /*sqlfilename*/ fullpath + "','" + lookfor + "','" + server + "','" + s + "')";
 	    				}	else {
-	    					HistorySQL = "Insert into LogRecords VALUES (" + UUID + ",'" + OS + "'," + epoch + ",'" + sqlfilename + "','" + lookfor + "','" + server + "','" + s + "');";	
+	    					HistorySQL = "Insert into LogRecords VALUES (" + UUID + ",'" + OS + "'," + epoch + ",'" + /*sqlfilename*/ fullpath + "','" + lookfor + "','" + server + "','" + s + "');";	
 	    				}
 	    				// log.info(HistorySQL);
 	    				int dofinish = stmt.executeUpdate(HistorySQL);

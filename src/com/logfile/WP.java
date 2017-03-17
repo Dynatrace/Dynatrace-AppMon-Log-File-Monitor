@@ -65,26 +65,29 @@ public class WP implements Monitor {
 			return errorState;
 		}
 
+		String os=env.getConfigString("OS");
+		if (os.equals("Linux")){
+		
+			String unameoutput;
+			try {
+				unameoutput = connMethod.executeCommand("uname", "");
+				log.fine("unameoutput: " + unameoutput);
+				if ("".equals(unameoutput)) {
+					throw new IOException("uname command did not produce any output.");
+				}
+			} catch (Exception e) {
+				Status stat = new Status();
+				stat.setStatusCode(Status.StatusCode.ErrorInfrastructure);
+				stat.setShortMessage("uname command failed");
+				stat.setException(e);
 
-		String unameoutput;
-		try {
-			unameoutput = connMethod.executeCommand("uname", "");
-			log.fine("unameoutput: " + unameoutput);
-			if ("".equals(unameoutput)) {
-				throw new IOException("uname command did not produce any output.");
+				if (log.isLoggable(Level.WARNING)){
+					log.log(Level.WARNING, stat.getShortMessage(), e);
+				}
+
+				//connMethod.teardown();
+				return stat;
 			}
-		} catch (Exception e) {
-			Status stat = new Status();
-			stat.setStatusCode(Status.StatusCode.ErrorInfrastructure);
-			stat.setShortMessage("uname command failed");
-			stat.setException(e);
-
-			if (log.isLoggable(Level.WARNING)){
-				log.log(Level.WARNING, stat.getShortMessage(), e);
-			}
-
-			//connMethod.teardown();
-			return stat;
 		}
 		log.finer("doSetup method connection ran");
 		return new Status();
@@ -100,20 +103,21 @@ public class WP implements Monitor {
 			return null;
 		}
 		
-		String sshUsername = env.getConfigString("LUser");
-	    String sshPassword = env.getConfigPassword("LPass");
-	    String sshKey = env.getConfigString("Key");
-	    String sshHost = env.getHost().getAddress();
-	    int sshPort = 22;
-	    
-	    //BEGIN NEW CODE
-	    String method = env.getConfigString(CONFIG_METHOD) == null ? "SSH" : env
+		String os=env.getConfigString("OS");
+
+		String method="";
+		
+		if (os.equals("Windows")){
+		    // Method for Windows is 'LOCAL' -- SSH fields are hidden by cfg screen when selecting 'Windows'
+		    method = "LOCAL" ;
+		} else if (os.equals("Linux")){
+		    method = env.getConfigString(CONFIG_METHOD) == null ? "SSH" : env
 	                .getConfigString(CONFIG_METHOD).toUpperCase();
+		} else {	
+			// unreachable code ? unless if someone changes the plugin.xml String values
+		}
 	    log.fine("method variable = " + method);
-	    String authMethod = env.getConfigString(CONFIG_AUTH_METHOD) == null ? "PASSWORD" : env
-	                .getConfigString(CONFIG_AUTH_METHOD).toUpperCase();
-	    log.fine("authMethod variable = " + authMethod);
-	    log.fine("sshKey variable = " + sshKey);
+		
 	    
 	    /*String port = (env.getConfigString(CONFIG_PORT) == null || env.getConfigString(CONFIG_PORT).isEmpty()) ? "22" : env.getConfigString(CONFIG_PORT);
 
@@ -127,42 +131,61 @@ public class WP implements Monitor {
 	     
 	    connMethod = ConnectionMethod.getConnectionMethod(method);
 
-		try {
-			if (method.equalsIgnoreCase("SSH") && authMethod.equalsIgnoreCase("Public Key")){
-				log.finer("Calling Public Key setup...");
-				log.finer("sshKey variable = " + sshKey);
-				((SSHConnectionMethod)connMethod).setup(sshHost, sshUsername, sshPassword, sshPort, sshKey);
-			} else {
-				connMethod.setup(sshHost, sshUsername, sshPassword, sshPort);
-			}
+		if (method.equalsIgnoreCase("SSH")) {
+			
+			String sshUsername = env.getConfigString("LUser");
+		    String sshPassword = env.getConfigPassword("LPass");
+		    String sshKey = env.getConfigString("Key");
+		    String sshHost = env.getHost().getAddress();
+		    int sshPort = 22;
+		    
+		    
+		    //BEGIN NEW CODE
+		    String authMethod = env.getConfigString(CONFIG_AUTH_METHOD) == null ? "PASSWORD" : env
+		                .getConfigString(CONFIG_AUTH_METHOD).toUpperCase();
+		    log.fine("authMethod variable = " + authMethod);
+		    log.fine("sshKey variable = " + sshKey);
+
+			
+			try {
+				if (authMethod.equalsIgnoreCase("Public Key")){
+			
+					log.finer("Calling Public Key setup...");
+					log.finer("sshKey variable = " + sshKey);
+					((SSHConnectionMethod)connMethod).setup(sshHost, sshUsername, sshPassword, sshPort, sshKey);
+				} else {
+					connMethod.setup(sshHost, sshUsername, sshPassword, sshPort);
+				}
 		//END NEW CODE
-		} catch (Exception e) {
-			Status stat = new Status();
-			stat.setStatusCode(Status.StatusCode.ErrorInfrastructure);
-			stat.setShortMessage("Connecting failed");
-			stat.setMessage("Connecting via " + method + " to " + sshHost + " failed");
-			stat.setException(e);
+			} catch (Exception e) {
+				Status stat = new Status();
+				stat.setStatusCode(Status.StatusCode.ErrorInfrastructure);
+				stat.setShortMessage("Connecting failed");
+				stat.setMessage("Connecting via " + method + " to " + sshHost + " failed");
+				stat.setException(e);
 	
-			if (log.isLoggable(Level.WARNING)){
-				log.log(Level.WARNING, stat.getMessage(), e);
+				if (log.isLoggable(Level.WARNING)){
+					log.log(Level.WARNING, stat.getMessage(), e);
+				}
+	
+				return stat;
 			}
-	
-			return stat;
+			
+			log.info("Connection setup successful");
 		}
-		log.info("Connection setup successful");
-	return null;
+		return null;
 		
 	}
 	
 	@Override
 	public Status execute(MonitorEnvironment env) throws Exception {
 	     Status resultstat = new Status(Status.StatusCode.Success);
-	     String fileHost = env.getHost().getAddress();
+		 String connectionIP = env.getHost().getAddress();
 	     String OS = env.getConfigString("OS");
 	     String sshConnMethod = env.getConfigString("authMethod");
 	     String directory = env.getConfigString("Directory");
 	     String file = env.getConfigString("File");
-	     String realfile = directory + file;
+	     String realfile = directory +'/'+ file;
 	     String search = env.getConfigString("SearchTerm");
 	     String dbType = env.getConfigString("dbType");
 	     String SQLServer = env.getConfigString("SQLServer");
@@ -180,7 +203,8 @@ public class WP implements Monitor {
 	     int line = 0;
 	     String result = null;
 	     String[] lines = null;
-	     log.info("Connecting to " + realfile + " on " + fileHost +"...");
+	     String fullpath=null;
+	     log.info("Connecting to " + realfile + " on " + connectionIP +"...");
 	     if(OS.equals("Linux"))
 	     {
 	    	 //String sshUserName = env.getConfigString("LUser");
@@ -225,11 +249,14 @@ public class WP implements Monitor {
 		     }*/
 		     if(FRegex)
 		     {
-		    	 String findcommand = "ls " + realfile + " -ltc | awk \'{print $9}\'";
+		    	 String findcommand = "ls -ltc " + realfile + " | awk \'{print $9}\'";
 		    	 //OLD CODE 
 		    	 //String filereturn = instance.sendCommand(findcommand);
 		    	 //NEW CODE
-		    	 String filereturn = ConnectionMethod.getConnectionMethod(sshConnMethod).executeCommand(findcommand, "");
+		    	 
+		    	 //String filereturn = ConnectionMethod.getConnectionMethod(sshConnMethod).executeCommand(findcommand, "");
+		    	 String filereturn = connMethod.executeCommand(findcommand, "");
+		    	 
 		    	 if(filereturn.equals(""))
 	    		 {
 	    			 stat.setStatusCode(Status.StatusCode.ErrorInfrastructureUnreachable);
@@ -246,10 +273,10 @@ public class WP implements Monitor {
 		     //OLD CODE 
 		     //result = instance.sendCommand(command);
 		     //NEW CODE
-		     log.fine("Connection Method: " + sshConnMethod);
+		     // log.fine("Connection Method: " + sshConnMethod);
 		     log.fine("Read File Command: " + command);
-		     log.finer("Trying to get ConnectionMethod...");
-		     ConnectionMethod.getConnectionMethod(sshConnMethod);
+		     //log.finer("Trying to get ConnectionMethod...");
+		     // ConnectionMethod.getConnectionMethod(sshConnMethod);
 		     log.finer("Trying to get the command result...");
 		     //result = ConnectionMethod.getConnectionMethod(sshConnMethod).executeCommand(command, "");
 		     result = connMethod.executeCommand(command, "");
@@ -258,13 +285,16 @@ public class WP implements Monitor {
 		     //OLD CODE 
 		     //instance.close();
 		     lines = result.split("(\\n|\\r)");
+		     
+		     fullpath="//"+connectionIP+realfile;
 	     }
 	     else if(OS.equals("Windows"))
 	     {
 	    	 File thefile = null; 
 	    	 if(FRegex)
 	    	 {
-	    		 thefile = WinFileRegex.lastFileModified(("\\\\" + fileHost + directory), file);
+	    		 log.info("Seeking file by Regex: "+ ("\\\\" + connectionIP + directory) + " " + file);
+	    		 thefile = WinFileRegex.lastFileModified(("\\\\" + connectionIP + directory), file);
 	    		 if(thefile == null)
 	    		 {
 	    			 stat.setStatusCode(Status.StatusCode.ErrorInfrastructureUnreachable);
@@ -274,11 +304,14 @@ public class WP implements Monitor {
 	    	 }
 	    	 else
 	    	 {
-	    		 thefile = new File("\\\\" + fileHost + directory + file);
+	    		 log.info("Seeking file by path: "+ "\\\\" + connectionIP + directory +"\\"+ file);
+	    		 thefile = new File("\\\\" + connectionIP + directory +"\\"+ file);
 	    	 }
+		     log.info("File found: " + thefile.getCanonicalPath());
 	    	 try {
 	    		List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
 	    	 	lines = lineList.toArray(new String[lineList.size()]);;
+	    	 	fullpath=thefile.getPath();
 	    	 }
 	    	 catch (FileNotFoundException e) {
 				  StringWriter sw = new StringWriter();
@@ -298,12 +331,13 @@ public class WP implements Monitor {
 	    		  stat.setMessage("Plugin configuration issue, please ensure the correct settings are entered into the monitor configuration.");
 	    		  return stat;
 	    	 }
-	     }
+	     } /* else { unreachable block unless when plugin.xml specifies new OS types } */
+
 	     
 	     if(lines != null)
 	     {
 	    	 
-	    	 LogFile linlog = new LogFile(fileHost,directory,file,search,dbType,SQLServer,Database,sqlPort,sqlUsername,sqlPassword);
+	    	 LogFile linlog = new LogFile(connectionIP,/*directory,file,*/fullpath,search,dbType,SQLServer,Database,sqlPort,sqlUsername,sqlPassword);
 	    	 linlog.getCurrentValues();
 	    	 line = linlog.checkFile(lines, (int) additionallines, skiprec);
 	    	 lines = null;
