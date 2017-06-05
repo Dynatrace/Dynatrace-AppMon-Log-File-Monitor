@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-SymbolicName: com.logfile;singleton:=true
-Bundle-Version: 3.16.4
+Bundle-Version: 3.16.5
 Bundle-Name: Log File Scraper
 Bundle-ClassPath: .,lib/com.dynatrace.diagnostics.sdk.jar,lib/guava-14
- .0.1.jar,lib/jsch-0.1.49.jar,lib/ojdbc6.jar,lib/postgresql-9.4-1201.j
- dbc41.jar,lib/sqljdbc4.jar,lib/trilead-ssh2-build213.jar
+ .0.1.jar,lib/jsch-0.1.49.jar,lib/ojdbc6.jar,lib/postgresql-9.3-1102.j
+ dbc4.jar,lib/postgresql-9.4-1201.jdbc41.jar,lib/sqljdbc4.jar,lib/tril
+ ead-ssh2-build213.jar
 Require-Bundle: com.dynatrace.diagnostics.sdk
 Bundle-ManifestVersion: 2
 Bundle-Vendor: dynaTrace Community
