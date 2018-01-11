@@ -58,6 +58,12 @@
       <property key="Directory" label="Directory" type="string" description="The network path to the shared filed on the server that contains the log file.  &#xA;Example: /myapplication/logs/  &#xA;This entry will be combined with the host name to create the network path to the file: //localhost/myapplication/logs/" default="/myapplications/logs/" multiline="false" />
       <property key="FileRegex" label="File Regex" type="boolean" description="If this is selected then the file must be specified in terms of a regex expression.  If the directory contains multiple files that match the regex the newest file will be selected" default="false" />
       <property key="File" label="File" type="string" description="The File that you wish to search.  If the File Regex option is checked, then this must be a regex. If running using Windows, this file must be shared to the user running the dynaTrace Collector." default="Example.log" multiline="false" />
+      <property key="FileEncoding" label="File Encoding" type="list" description="Encoding of the file, default that is used is UTF-8." default="UTF-8">
+        <list>
+          <item value="UTF-8" />
+          <item value="UTF-16" />
+        </list>
+      </property>
       <property key="SearchTerm" label="Search Term" type="string" description="A regex of what you wish to search for within the log file.  The search is completed per line. Example .*Warning.*" default="" multiline="false" />
       <property key="dbType" label="Database Type" type="list" description="The type of database where the log file scraper entries will be stored." default="SQL Server">
         <list>

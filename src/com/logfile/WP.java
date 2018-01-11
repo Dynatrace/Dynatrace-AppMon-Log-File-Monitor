@@ -185,6 +185,7 @@ public class WP implements Monitor {
 	     String sshConnMethod = env.getConfigString("authMethod");
 	     String directory = env.getConfigString("Directory");
 	     String file = env.getConfigString("File");
+	     String encoding = env.getConfigString("FileEncoding");
 	     String realfile = directory +'/'+ file;
 	     String search = env.getConfigString("SearchTerm");
 	     String dbType = env.getConfigString("dbType");
@@ -309,9 +310,18 @@ public class WP implements Monitor {
 	    	 }
 		     log.info("File found: " + thefile.getCanonicalPath());
 	    	 try {
-	    		List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
-	    	 	lines = lineList.toArray(new String[lineList.size()]);;
-	    	 	fullpath=thefile.getPath();
+	    		//Original code for UTF 8
+	    		//List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
+	    		if (encoding.equals("UTF-8")) {
+	    			List<String> lineList = Files.readLines(thefile, Charsets.UTF_8);
+		    	 	lines = lineList.toArray(new String[lineList.size()]);;
+		    	 	fullpath=thefile.getPath();
+	    		} else if (encoding.equals("UTF-16")) {
+	    			List<String> lineList = Files.readLines(thefile, Charsets.UTF_16);
+		    	 	lines = lineList.toArray(new String[lineList.size()]);;
+		    	 	fullpath=thefile.getPath();
+	    		}
+	    		
 	    	 }
 	    	 catch (FileNotFoundException e) {
 				  StringWriter sw = new StringWriter();

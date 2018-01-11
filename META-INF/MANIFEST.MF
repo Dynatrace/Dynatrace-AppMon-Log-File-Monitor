@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-SymbolicName: com.logfile;singleton:=true
-Bundle-Version: 3.16.5
+Bundle-Version: 3.16.6
 Bundle-Name: Log File Scraper
 Bundle-ClassPath: .,lib/com.dynatrace.diagnostics.sdk.jar,lib/guava-14
  .0.1.jar,lib/jsch-0.1.49.jar,lib/ojdbc6.jar,lib/postgresql-9.3-1102.j
